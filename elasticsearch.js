@@ -55,3 +55,22 @@ function initMapping(){
   });
 }
 exports.initMapping = initMapping;
+
+function addDocument(document){
+  return elasticClient.index({
+    index: indexName,
+    type: "document",
+    body: {
+      properties: {
+        title: document.title,
+        content: document.content,
+        suggest: {
+          input: document.title.split(" "),
+          output: document.title,
+          payloads: document.metadata || {}
+        }
+      }
+    }
+  })
+}
+exports.addDocument = addDocument;
