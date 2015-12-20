@@ -4,9 +4,11 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var elastic = require('./elasticsearch');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var documents = require('./routes/documents');
 
 var app = express();
 
@@ -53,6 +55,32 @@ app.use(function(err, req, res, next) {
   res.render('error', {
     message: err.message,
     error: {}
+  });
+});
+
+app.use('/documents', documents);
+
+elastic.checkIndex().then(function(exists){
+  if (exists) { return elastic.deleteIndex();}
+}).then(function(){
+  return elastic.initIndex().then(elastic.initMapping).then(function(){
+    //titles for autocomplete
+    var promises = [
+      'Thing Explainer',
+      'The Internet is a Playground',
+      'The Pragmatic Programmer',
+      'The Hitchhikers Guide to the Galaxy',
+      'Trial of the Clone'
+    ].map(function(bookTitle){
+      return elastic.addDocument({
+        title: bookTitle,
+        content: bookTitle + "contents",
+        metadata: {
+          titleLength: bookTitle.length
+        }
+      });
+    });
+    return Promise.all(promises);
   });
 });
 

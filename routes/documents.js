@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var elastic = require('.../elasticsearch');
+var elastic = require('elasticsearch');
 
 //GET Suggests
 router.get('/suggest/:input', function(req, res, next){

@@ -31,7 +31,7 @@ function checkIndex(){
 }
 exports.checkIndex = checkIndex;
 
-checkIndex.then(function(exists) {
+checkIndex().then(function(exists) {
   if (exists)
     return deleteIndex();
 }).this(initIndex);
